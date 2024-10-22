@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS Tools for Data Science Workshop</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jasmin Mehnert and Kirill Kharlashkin" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# IDS Tools for Data Science Workshop
+]
+.subtitle[
+## Working with factors and labels
+]
+.author[
+### Jasmin Mehnert and Kirill Kharlashkin
+]
+.institute[
+### Hertie School
+]
+
+---
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+/*.columns { display: flex; }*/
+
+a, a &gt; code {
+  color: rgb(249, 38, 114); || sets color of links */
+  text-decoration: none; /* turns off background coloring of links */
+}
+
+.title-slide {
+  background-color: #23373B;
+  border-top: 80px solid #23373B;
+}
+
+.title-slide h1  {
+  color: #FFFFFF;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 50px;
+}
+
+.title-slide h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #FFFFFF;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide h3  {
+  color: #FFFFFF;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+hr, .title-slide h2::after, .mline h1::after {
+  content: '';
+  display: block;
+  border: none;
+  background-color: rgb(249, 38, 114);
+  color: rgb(249, 38, 114);
+  height: 2px;
+}
+
+h1 code, h2 code, h3 code, h4 code, h5 code {
+    background-color: #grey87;  /* This is a light gray color. Modify as needed. */
+    color: #333;                /* This is almost black. Modify as desired. */
+    padding: 2px 5px;           /* Adjusts the padding around the inline code */
+}
+
+
+.pull-left {
+  padding-top: 0px;
+}
+
+.pull-left-narrow {
+  float: left;
+  width: 50%;
+  padding-bottom: 2px
+}
+
+.pull-right-wide {
+  float: right;
+  width: 50%;
+  padding-top: 0;
+  padding-bottom: 2px/* Set to 0 or any value you feel looks right */
+}
+
+.column {
+  float: left;
+  width: 33%;
+  padding: 3px;
+  box-sizing: border-box; /* Include padding in the width calculation */
+}
+
+&lt;/style&gt;
+
+# Outline of the presentation
+
+**1. Understanding factors and labels**
+  - What are factors?
+  
+  - What are labels and labelled data?
+  
+  - What packages are used for working with factors?
+  
+  - What packages are used for working with labels and labelled data?
+
+&lt;br&gt;
+**2. Examples of `forcats` functions**
+
+&lt;br&gt;
+**3. Examples of `sjlabelled` functions**
+
+
+---
+class: inverse, center, middle
+
+# Understanding factors and labels
+
+---
+
+# Factors help to work with categorical variables in R
+**Factors are (a) compound objects that take (b) categorical variables and store them in (c) levels**
+.pull-left[
+*Let's split this definition to bits and pieces:*
+
+**(a) Compound objects** means factors have 2 elements:
+  - vector with values of categories
+  - vector with levels of categories
+
+**(b) Categorical** variables are nominal and ordinal:
+  - nominal variables: 2+ categories, NO ordering
+  - ordinal variables: 2+ categories WITH ordering
+
+**(c) Levels** are names of categories:
+  - levels are specific for factors
+  - vectors do not have levels, that's the point
+  - ordering levels is important for ordinal variables
+]
+
+.pull-right[
+*Simple example of factors for ordinal variables:*
+
+``` r
+# creating a factor with ordered levels
+sizes &lt;- factor(
+  x = c('sm', 'md', 'lg', 'sm', 'md'),
+  levels = c('sm', 'md', 'lg'),
+  ordered = TRUE)
+
+sizes
+```
+
+```
+## [1] sm md lg sm md
+## Levels: sm &lt; md &lt; lg
+```
+]
+---
+# Factors have values &amp; levels, but also can have labels
+**The function `factor()` converts vectors into factors: it uses (a) `levels` as inputs and (b) `labels` as outputs**
+.pull-left[
+*To bits and pieces again:*
+
+**(a) Levels** are inputs:
+  - provide levels with optional `levels=` argument
+  - do it if you want more levels than observed
+  - if not provided, unique values are used as levels
+  
+**(b) Labels** are outputs:
+  - provide labels with optional `labels=` argument  
+  - do it if you want to change names for levels
+  - these labels are different from labels in labelled data
+]
+
+.pull-right[
+*Simple example of using levels and labels for factors:*
+
+``` r
+vec &lt;- c(1, 2, 3, 1, 2, 3, 2)
+
+# creating a factor with more levels than observed
+num_vec &lt;- factor(vec, 
+                  levels = 1:5)
+num_vec
+```
+
+```
+## [1] 1 2 3 1 2 3 2
+## Levels: 1 2 3 4 5
+```
+
+``` r
+# modifying a factor with labels
+word_vec &lt;- factor(num_vec, 
+                   labels = c("one", "two", "three"))
+word_vec
+```
+
+```
+## [1] one   two   three one   two   three two  
+## Levels: one two three
+```
+]
+---
+# Most operations with factors are handled with `forcats`
+.pull-left[
+&lt;img src="https://forcats.tidyverse.org/logo.png" height="220px" /&gt;
+
+**Forcats package**
+
+- `forcats` is anagram of factors
+- packages has functions for working with factors
+- package is a part of a basic `tidyverse`
+
+``` r
+library(forcats)
+```
+]
+
+.pull-right[
+**Key use cases of `forcats`:**
+- Creating and counting factors
+
+- Combining, adding and dropping factors
+
+- Changing the values of factors
+
+- Changing the order of factors
+
+*We will introduce some of these use cases later*
+]
+
+---
+# Labels appear in the so-called labelled data
+**In (a) labelled data both (b) variables and (c) values have 2 features: names/codes and labels**
+.pull-left[
+*To bits and pieces again:*
+
+**(a) Labelled data** often arises in survey data
+
+**(b) Variables** in labelled data:
+  - variable names
+  - variable labels
+  
+**(c) Values** in labelled data:
+  - value codes
+  - value labels
+  
+**Other packages** (SAS, STATA, SPSS) have infrastructures for labelled data, R uses 3 packages to deal with labelled data
+]
+
+.pull-right[
+*Simple example of labelled data*:
+
+``` r
+# Let's show labelled data in Iris data set -
+# one of the most popular sets used for training
+look_for(iris, "pet")
+```
+
+```
+##  pos variable     label col_type missing values
+##  3   Petal.Length —     dbl      0             
+##  4   Petal.Width  —     dbl      0
+```
+]
+
+---
+# You might need to convert value labels to factors
+
+**Value labels are important for data analysis** 
+
+- Value labels doesn’t imply that your vectors should be considered as categorical or continuous
+
+- Therefore, value labels are not intended to be used for data analysis
+
+- Before data analysis, you should convert vectors with value labels into **factors** or **classic numeric/character vectors**.
+
+*Workflow illustration*
+
+.center[
+
+]
+
+---
+# We use 3 packages for working with labels
+.column[.center[
+&lt;img src="https://haven.tidyverse.org/logo.png" width="115px" /&gt;
+
+**Haven package**
+]
+- enables to read and write data formats used by SAS, SPSS, and Stata
+
+- translates value labels into new `haven_labelled()` classes
+
+- preserves semantics in these classes to be coerced to factors
+]
+
+.column[.center[
+&lt;img src="https://larmarange.github.io/labelled/reference/figures/labelled.png" width="115px" /&gt;
+
+**Labelled package**
+]
+- works with vectors of new `haven_labelled()` class from `haven` package
+
+- proposes functions to manipulate such vectors and their metadata
+
+- allows to get, set or change value and variable label attributes
+]
+
+.column[.center[
+&lt;img src="https://strengejacke.github.io/sjlabelled/reference/figures/logo.png" width="115px" /&gt;
+
+**Sjlabelled package**
+]
+- functions are similar to `labelled` package: getting, setting and changing label attributes
+
+- difference: its functions do not require a `haven_labelled()` class
+]
+
+---
+# To sum up: factors and labels are connected
+
+**Factors:**
+1. They are used for handling categorical variables and particularly important for ordinal categorical variables
+
+2. They have values and levels, and might also have `labels=` as an optional argument in `factor()` function
+
+3. `labels=` argument in `factor()` function is different from labels in labelled data, **do not confuse them!**
+
+4. Factors are manipulated with `forcats` package
+
+**Labels in labelled data:**
+
+1. They provide information about variables and values and occur in survey data saved in SPSS, Stata or SAS packages
+
+2. They include variable labels and value labels (we omit missed value labels for now)
+
+3. Calue labels should be converted into factors or numerical characters before data analysis
+
+4. Labels are manipulated with 3 packages: `haven`, `labelled` and `sjlabelled`
+
+---
+class: inverse, center, middle
+
+# Selected `forcats` functions
+
+---
+# Creating and counting factors
+.pull-left-narrow[
+**Functions for coding**
+&lt;br&gt;
+- `factor()` to create factors 
+- `fct_count()` to count factors
+- `fct_unique()` to list unique factors
+
+**Code example**
+&lt;br&gt;
+
+``` r
+f &lt;- factor(c("never", "seldom", "sometimes", 
+              "often", "always", "always",
+              "seldom", "always","seldom",
+              "sometimes", "seldom", "seldom"))
+fct_unique(f)
+fct_count(f)
+```
+]
+
+.pull-right-wide[
+**Code results**
+&lt;br&gt;
+
+``` r
+# This is the output of unique factors and their levels
+fct_unique(f)
+```
+
+```
+## [1] always    never     often     seldom    sometimes
+## Levels: always never often seldom sometimes
+```
+
+``` r
+# This is the output of counting unique factors
+fct_count(f)
+```
+
+```
+## # A tibble: 5 × 2
+##   f             n
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 always        3
+## 2 never         1
+## 3 often         1
+## 4 seldom        5
+## 5 sometimes     2
+```
+]
+
+---
+# Combining, adding and dropping factors
+.pull-left-narrow[
+**Functions for coding**
+&lt;br&gt;
+- `fct_c()` to combine factors
+- `fct_drop()` to drop unused levels
+- `fct_na_value_to_level()` and `fct_na_value_to_value()`
+   to represent missing values in factors
+]
+
+.pull-right-wide[
+**Code example and results**
+&lt;br&gt;
+
+``` r
+# We combine factors with `fct_c`
+f1 &lt;- factor(c("never", "seldom"))
+f2 &lt;- factor(c("sometimes", "often", "always"))
+f_joined &lt;- fct_c(f1, f2)
+
+# We drop unused levels
+f3 &lt;- factor(c("never", "seldom"), 
+             levels = c("never", "seldom", "i don't know"))
+fct_drop(f3)
+```
+
+```
+## [1] never  seldom
+## Levels: never seldom
+```
+
+``` r
+# We bring NA to levels
+f4 &lt;- factor(c("never", "seldom", "seldom", NA, NA))
+f5 &lt;- fct_na_value_to_level(f4)
+levels(f5)
+```
+
+```
+## [1] "never"  "seldom" NA
+```
+]
+
+---
+# Changing the values of factors with `fct_recode()`
+.pull-left-narrow[
+**Functions for coding**
+&lt;br&gt;
+- **`fct_recode()`**
+- `fct_collapse()`
+- `fct_lump()`
+
+**Code example**
+&lt;br&gt;
+
+``` r
+# We use a data set of political support in the USA
+# We recode  factors of party identification
+gss_cat |&gt; 
+  mutate(partyid = fct_recode(partyid,
+    "Republican, strong"    = "Strong republican", 
+    "Republican, weak"      = "Not str republican",
+    "Independent, near rep" = "Ind,near rep",      
+    "Independent, near dem" = "Ind,near dem",
+    "Democrat, weak"        = "Not str democrat",  
+    "Democrat, strong"      = "Strong democrat"
+  )) |&gt; count(partyid)
+```
+]
+
+.pull-right-wide[
+**Code results**
+
+```
+## # A tibble: 10 × 2
+##    partyid                   n
+##    &lt;fct&gt;                 &lt;int&gt;
+##  1 No answer               154
+##  2 Don't know                1
+##  3 Other party             393
+##  4 Republican, strong     2314
+##  5 Republican, weak       3032
+##  6 Independent, near rep  1791
+##  7 Independent            4119
+##  8 Independent, near dem  2499
+##  9 Democrat, weak         3690
+## 10 Democrat, strong       3490
+```
+]
+
+---
+# Changing the values of factors with `fct_collapse()`
+.pull-left-narrow[
+**Functions for coding**
+&lt;br&gt;
+- `fct_recode()`
+- **`fct_collapse()`**
+- `fct_lump()`
+
+**Code example**
+&lt;br&gt;
+
+``` r
+# We reduce the number of variables with `fct_collapse`
+gss_cat |&gt;
+  mutate(partyid = fct_collapse(partyid,
+    other = c("No answer", "Don't know", "Other party"),
+    rep = c("Strong republican", "Not str republican"),
+    ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+    dem = c("Not str democrat", "Strong democrat")
+  )) |&gt; count(partyid)
+```
+]
+
+.pull-right-wide[
+**Code results**
+
+```
+## # A tibble: 4 × 2
+##   partyid     n
+##   &lt;fct&gt;   &lt;int&gt;
+## 1 other     548
+## 2 rep      5346
+## 3 ind      8409
+## 4 dem      7180
+```
+]
+
+---
+# Changing the values of factors with `fct_lump()`
+.pull-left-narrow[
+**Functions for coding**
+&lt;br&gt;
+- `fct_recode()`
+- `fct_collapse()`
+- **`fct_lump()`**
+
+**Code example**
+&lt;br&gt;
+
+``` r
+# We reduce the number of variables
+# of religious beliefs to top-5 and others
+gss_cat |&gt;
+  mutate(relig = fct_lump(relig, n = 5)) |&gt;
+  count(relig, sort = TRUE) |&gt;
+  print(n = Inf)
+```
+]
+
+.pull-right-wide[
+**Code results**
+
+```
+## # A tibble: 6 × 2
+##   relig          n
+##   &lt;fct&gt;      &lt;int&gt;
+## 1 Protestant 10846
+## 2 Catholic    5124
+## 3 None        3523
+## 4 Other        913
+## 5 Christian    689
+## 6 Jewish       388
+```
+]
+
+---
+class: inverse, center, middle
+
+# Selected `sjlabelled` functions
+
+---
+# Getting labels with `get_label()`
+.pull-left-narrow[
+**Get value labels**
+
+``` r
+# We use the data set on EUROFAMCARE - 
+# review of family carers of elderly people
+data(efc)
+# Getting value labels that explain 
+# the degree of dependency of the elderly
+get_labels(efc$e42dep, values = "p")
+```
+
+```
+## [1] "[1] independent"          "[2] slightly dependent"  
+## [3] "[3] moderately dependent" "[4] severely dependent"
+```
+]
+
+.pull-right-wide[
+**Get variable levels**
+
+``` r
+# Getting variable labels that explain 
+# the meaning of the variables
+get_label(efc$e42dep)
+```
+
+```
+## [1] "elder's dependency"
+```
+
+``` r
+get_label(efc$e15relat)
+```
+
+```
+## [1] "relationship to elder"
+```
+]
+
+---
+# Setting value and variable labels with `set_label()`
+.pull-left-narrow[
+**Setting value labels**
+
+``` r
+# We set 2 out of 4 value labels
+# for one of the indicators from the data
+efc |&gt;
+  select(c82cop1) |&gt;
+  set_labels(labels = c("not often" = 1, 
+                        "very often" = 4)) |&gt; 
+  frq()
+```
+
+```
+## do you feel you cope well as caregiver? (c82cop1) &lt;numeric&gt; 
+## # total N=908 valid N=901 mean=3.12 sd=0.58
+## 
+## Value |      Label |   N | Raw % | Valid % | Cum. %
+## ---------------------------------------------------
+##     1 |  not often |   3 |  0.33 |    0.33 |   0.33
+##     2 |          2 |  97 | 10.68 |   10.77 |  11.10
+##     3 |          3 | 591 | 65.09 |   65.59 |  76.69
+##     4 | very often | 210 | 23.13 |   23.31 | 100.00
+##  &lt;NA&gt; |       &lt;NA&gt; |   7 |  0.77 |    &lt;NA&gt; |   &lt;NA&gt;
+```
+]
+
+.pull-right-wide[
+**Setting variable labels**
+
+``` r
+# We set new variable labels for the variables
+x &lt;- set_label(efc$e42dep, 
+               label = "The scale of elder's dependency")
+str(x)
+```
+
+```
+##  num [1:908] 3 3 3 4 4 4 4 4 4 4 ...
+##  - attr(*, "label")= chr "The scale of elder's dependency"
+##  - attr(*, "labels")= Named num [1:4] 1 2 3 4
+##   ..- attr(*, "names")= chr [1:4] "independent" "slightly dependent" "moderately dependent" "severely dependent"
+```
+]
+
+---
+# Converting value labels to factors with `as_label()`
+.pull-left-narrow[
+
+``` r
+# We get the values of two variables
+# Level of the dependency of an elderly family member
+head(efc$e42dep)
+```
+
+```
+## [1] 3 3 3 4 4 4
+```
+
+``` r
+# Sex of an elderly family member
+head(efc$e16sex)
+```
+
+```
+## [1] 2 2 2 2 2 2
+```
+
+``` r
+#We convert these variables to factors and make a table
+example &lt;- table(sjlabelled::as_label(efc$e42dep), 
+                 sjlabelled::as_label(efc$e16sex))
+example
+```
+
+```
+##                       
+##                        male female
+##   independent            23     43
+##   slightly dependent     70    154
+##   moderately dependent  109    197
+##   severely dependent     93    211
+```
+]
+
+.pull-right-wide[
+![](presentation_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+]
+
+---
+# Further information on packages is available at:
+- Forcats: https://forcats.tidyverse.org/index.html
+
+- Haven package: https://haven.tidyverse.org/
+
+- Labelled package: https://larmarange.github.io/labelled/ 
+
+- Sjlabelled package: https://strengejacke.github.io/sjlabelled/
+
+- Article. Leveraging labelled data in R: https://www.pipinghotdata.com/posts/2020-12-23-leveraging-labelled-data-in-r/
+
+- Tutorial on Sjlabelled: https://strengejacke.github.io/sjlabelled/articles/intro_sjlabelled.html
+---
+class: inverse, center, middle
+
+# Q&amp;A time
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"hash": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
