@@ -291,7 +291,7 @@ look_for(iris, "pet")
 
 .center[
 ```{r echo=FALSE, out.width="115px"}
-#knitr::include_graphics("")
+knitr::include_graphics("picture of value labels workflow.png")
 ```
 ]
 
@@ -299,7 +299,7 @@ look_for(iris, "pet")
 # We use 3 packages for working with labels
 .column[.center[
 ```{r echo=FALSE, out.width="115px"}
-knitr::include_graphics("https://haven.tidyverse.org/logo.png")
+knitr::include_graphics("picture of value labels workflow.png")
 ```
 
 **Haven package**
