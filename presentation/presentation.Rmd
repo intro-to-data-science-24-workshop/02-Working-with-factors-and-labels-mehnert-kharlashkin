@@ -290,8 +290,8 @@ look_for(iris, "pet")
 *Workflow illustration*
 
 .center[
-```{r echo=FALSE, out.width="115px"}
-#knitr::include_graphics("picture of value labels workflow.png")
+```{r echo=FALSE, out.height="300px", out.width = "800px"}
+knitr::include_graphics("picture of value labels workflow.png")
 ```
 ]
 
