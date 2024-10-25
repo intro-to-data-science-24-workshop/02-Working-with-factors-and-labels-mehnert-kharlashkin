@@ -13,7 +13,7 @@ The objectives of this session are to:
 3. Equip you with hands-on practice materials and further resources for continued learning.
 
 ## Tutorial 
-The session is accompanied by a tutorial, which can be accessed [here]()
+The session is accompanied by a tutorial, which can be accessed [here](https://rawcdn.githack.com/intro-to-data-science-24-workshop/02-Working-with-factors-and-labels-mehnert-kharlashkin/refs/heads/main/Tutorial.Rmd)
 
 ## Instructors
 Kirill Karlashkin
