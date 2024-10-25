@@ -1,7 +1,6 @@
 # 02 Working with factors and labels
-This repository contains the materials designed to complement a live tutorial session focused on factors in R and the forcats package, which provides tools for working with categorical data.
 ## Summary
-This repository provides materials for a session that is part of the I2DS Tools for Data Science workshop run at the Hertie School, Berlin in October 2024. The student-run workshop is part of the course Introduction to Data Science taught by Simon Munzert at the Hertie School, Berlin, in Fall 2024.
+This repository provides materials for a session that is part of the [I2DS Tools for Data Science workshop](https://github.com/intro-to-data-science-24-workshop) run at the [Hertie School](https://www.hertie-school.org/en/), Berlin in October 2024. The student-run workshop is part of the course Introduction to Data Science taught by Simon Munzert at the Hertie School, Berlin, in Fall 2024.
 
 ### Session contents
 In this session, we introduce an approach to working with factors and labels in R using the forcats and sjlabelled packages. Organizing and labeling categorical data is fundamental in data science, enhancing interpretability and consistency in analysis. These packages equip users with efficient tools for handling categorical variables, ensuring clear and concise data manipulation.
