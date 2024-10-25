@@ -13,20 +13,23 @@ The objectives of this session are to:
 2. Demonstrate key functions of each package for factor manipulation and label management.
 3. Equip you with hands-on practice materials and further resources for continued learning.
 
-### Instructors
+## Tutorial 
+The session is accompanied by a tutorial, which can be accessed [here]()
+
+## Instructors
 Kirill Karlashkin
 
 Jasmin Mehnert
-### Further Resources
+## Further Resources
 [Forcats Documentation](https://your-website-link.com)
 
-Sjlabelled Package Documentation
+Sjlabelled Package Documentation[MIT license]()
 
-R for Data Science book – Factors and data wrangling
-### License
-The materials in this repository are available under the MIT license.
+R for Data Science book – Factors and data wrangling[MIT license]()
+## License
+The materials in this repository are available under the [MIT license]().
 
-### Statement of Contributions
+## Statement of Contributions
 Jasmin Mehnert prepared the practice materials, session tutorial and GitHub repository.
 
 Kirill Karlashkin prepared the workshop materials, the session workshop and the workshop recording.
