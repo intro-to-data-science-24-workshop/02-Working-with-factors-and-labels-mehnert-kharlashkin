@@ -1,4 +1,4 @@
-# 02-Working-with-factors-and-labels-mehnert-kharlashkin
+# 02 Working with factors and labels
 This repository contains the materials designed to complement a live tutorial session focused on factors in R and the forcats package, which provides tools for working with categorical data.
 ## Summary
 This repository provides materials for a session that is part of the I2DS Tools for Data Science workshop run at the Hertie School, Berlin in October 2024. The student-run workshop is part of the course Introduction to Data Science taught by Simon Munzert at the Hertie School, Berlin, in Fall 2024.
@@ -20,14 +20,24 @@ The session is accompanied by a tutorial, which can be accessed [here]()
 Kirill Karlashkin
 
 Jasmin Mehnert
+
 ## Further Resources
-[Forcats Documentation](https://your-website-link.com)
+[Forcats Documentation](https://forcats.tidyverse.org/index.html)
 
-Sjlabelled Package Documentation[MIT license]()
+[Sjlabelled package](https://strengejacke.github.io/sjlabelled/)
 
-R for Data Science book – Factors and data wrangling[MIT license]()
+[Haven package](https://haven.tidyverse.org/)
+
+[Labelled package](https://larmarange.github.io/labelled/)
+
+[Article. Leveraging labelled data in R](https://www.pipinghotdata.com/posts/2020-12-23-leveraging-labelled-data-in-r/)
+
+[Tutorial on Sjlabelled](https://strengejacke.github.io/sjlabelled/articles/intro_sjlabelled.html)
+
+[R for Data Science book – Factors](https://r4ds.hadley.nz/factors)
+
 ## License
-The materials in this repository are available under the [MIT license]().
+The materials in this repository are available under the [MIT license](https://opensource.org/license/mit).
 
 ## Statement of Contributions
 Jasmin Mehnert prepared the practice materials, session tutorial and GitHub repository.
