@@ -1,0 +1,214 @@
+---
+title: "Working with Factors and Labels"
+subtitle: "Live Tutorial"
+author: "Kirill Karlashkin & Jasmin Mehnert"
+date: "(Fall 2024) Introduction to Data Science Workshop"
+output: 
+    rmdformats::robobook:
+    toc: TRUE
+    df_print: paged
+    number_sections: FALSE
+    highlight: tango
+    toc_depth: 3
+    toc_float: true
+---
+```{=html}
+<style>
+.hint-button {
+  color: white;
+  background-color: #3498db; /* Blue */
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.solution-button {
+  color: white;
+  background-color: #2ecc71; /* Green */
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+details {
+  margin-bottom: 10px;
+}
+
+summary {
+  font-size: 1.1em;
+}
+
+summary:hover {
+  text-decoration: underline;
+}
+</style>
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Introduction 😺
+
+In this tutorial, we will explore how to work with **factors** and **labels** in R using two powerful packages: `forcats` and `sjlabelled`. These packages are particularly useful when dealing with categorical variables and labeling datasets to make them easier to interpret.
+
+# Getting Started 😸
+
+Let’s start by loading the required packages and our cleaned **Cat Breeds Dataset**. The dataset contains information on different breeds of cats for adoption, including their age, gender, size and breed name. 
+<span style="font-size:0.8em;">Kudos to Ma7555 for the original dataset! Retrieved from Kaggle: <https://www.kaggle.com/datasets/ma7555/cat-breeds-dataset></span>
+
+```{r, include=TRUE}
+# Install necessary packages if not already installed
+required_packages <- c("forcats", "sjlabelled", "dplyr", "ggplot2")
+new_packages <- required_packages[!(required_packages %in% installed.packages()[, "Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load necessary librarys
+library(forcats) # Useful for working with categorical data (factors).
+library(sjlabelled) # Helps with labeling data frames and variables.
+library(dplyr) # Provides functions for data manipulation.
+library(ggplot2) # Used for creating complex and customizable plots.
+
+# Load the data
+cat_breeds <- read.csv("data/cat_breeds_cleaned.csv")
+
+# Inspect the structure of the dataset
+str(cat_breeds)
+```
+
+# Task 1: Explore and Convert Columns to Factors 🐱
+
+Inspect the structure of the `cat_breeds` dataset, find the unique values in each column, and convert the `age`, `size`, `gender`, and `breed` columns into factors. Remember that some factors are ordered!
+
+<details> <summary class="hint-button">🔍 Click for a Hint</summary> <p>Use `sapply()` and `unique()` to check unique values. Convert the columns using the `factor()` function. Be sure to specify the levels for ordered factors.</p> </details>
+
+<details> <summary class="solution-button">💡 Click to see the Solution</summary>
+```{r, include = TRUE}
+# Check unique values in each column
+sapply(cat_breeds, unique)
+
+# Convert columns to factors (with ordered levels where applicable)
+cat_breeds$age <- factor(cat_breeds$age, levels = c("Baby", "Young", "Adult", "Senior"), ordered = TRUE)
+cat_breeds$size <- factor(cat_breeds$size, levels = c("Small", "Medium", "Large", "Extra Large"), ordered = TRUE)
+cat_breeds$gender <- factor(cat_breeds$gender)
+cat_breeds$breed <- factor(cat_breeds$breed)
+
+# Check the structure again after conversions
+str(cat_breeds)
+```
+</details>
+# Task 2: Factor Manipulation with `forcats` 🐾
+
+Simplify the dataset by keeping only the 10 most frequent cat breeds, and lump the rest together as "Other."
+
+<details> <summary class="hint-button">🔍 Click for a Hint</summary> Use the `fct_lump()` function from the `forcats` package to group less frequent categories. In `fct_lump(f, n)` use the parameter n for the number of most frequent levels to keep. All other levels are lumped into "Other". </details>
+
+<details> <summary class="solution-button">💡 Click to see the Solution</summary>
+```{r, include = TRUE}
+# Keep the 10 most frequent breeds, lump the rest into "Other"
+cat_breeds$breed <- fct_lump(cat_breeds$breed, n = 10)
+
+# Check the structure again to verify the changes
+str(cat_breeds$breed)
+```
+</details>
+# Task 3: Find the monster breed! 🐾😈
+
+The Monster Breed is the most common breed that has the highest number of Extra Large cats! 🐱💪
+
+What we did for you in the hints:
+Filter the dataset for cats of size "Extra Large".
+Group the data by breed and summarize the number of Extra Large cats for each breed.
+Visualize the results with the breeds in random order.
+
+Your goal is to:
+Visualize the result again, but with the breeds ordered by the number of cats to help find the Monster Breed!
+
+
+<details> <summary class="hint-button">🔍 Click for a Hint</summary>
+Use `filter()` and `group_by()` to create the summary, and `fct_reorder()` to reorder the breeds in the plot by the amount of Extra Large cats! In `fct_reorder(f, x)` use parameter f for factor that needs to be reordered and x for numerical vector to reorder f by.
+```{r, include = TRUE}
+# Filter for Extra Large cats
+extra_large_cats <- cat_breeds |> 
+  filter(size == "Extra Large")
+
+# Summarize the data by breed
+extra_large_summary <- extra_large_cats |> 
+  group_by(breed) |> 
+  summarize(count = n())
+
+# First plot (unordered)
+ggplot(extra_large_summary, aes(x = count, y = breed)) +
+  geom_point(color = "#3498db", size = 4) +
+  labs(title = "Extra Large Cats by Breed (Unordered)",
+       x = "Number of Cats",
+       y = "Breed")
+```
+</details>
+
+<details> <summary class="solution-button">💡 Click to see the Solution</summary>
+```{r, include = TRUE}
+# Second plot (ordered by count)
+ggplot(extra_large_summary, aes(x = count, y = fct_reorder(breed, count))) +
+  geom_point(color = "#3498db", size = 4) +
+  labs(title = "Extra Large Cats by Breed (Ordered by Count)",
+       x = "Number of Cats",
+       y = "Breed (Ordered)")
+```
+</details>
+<details> <summary class="solution-button">😈 See the Monster 😈</summary>
+  <img src="images/Kudos.png" alt="Kudos" width="300" style="display: block; margin-left: auto; margin-right: auto;"/>
+</details>
+# Task 4: Convert Gender to Binary and Set Labels 🐱
+
+Convert the `gender` column into a binary variable where 1 represents Female, 0 represents Male, and `NA` represents Unknown. Then, add labels to clarify these values and retrieve the labels for verification.
+
+<details> <summary class="hint-button">🔍 Click for a Hint</summary> <p>Use `mutate()` and `ifelse()` to assign numeric values to the gender column, and use `set_labels()` to add descriptive labels. In `set_labels(x, labels)` x is the variable you want to assign a label to and labels is a named vector where the names are the labels, and the values are the corresponding values of x. </p> </details>
+
+<details> <summary class="solution-button">💡 Click to see the Solution</summary>
+```{r, include = TRUE}
+# Convert gender to binary (0 = Female, 1 = Male, NA = Unknown)
+cat_breeds <- cat_breeds |> 
+  mutate(gender_binary = ifelse(gender == "Female", 1, 
+                                ifelse(gender == "Male", 0, NA)))
+
+# Optionally, add labels for clarity
+cat_breeds$gender_binary <- set_labels(cat_breeds$gender_binary, 
+                                       labels = c("Female" = 1, "Male" = 0))
+
+# Retrieve and check the labels
+get_labels(cat_breeds$gender_binary)
+```
+</details>
+# Task 5: Reorder Size Factor Levels 🐾
+
+Reorder the `size` factor levels to show "Extra Large" first, followed by "Large", "Medium" and "Small". Afterwards reverse what you just did - cause everybody prefers baby cats 👶!
+
+<details> <summary class="hint-button">🔍 Click for a Hint</summary> Use the `fct_relevel()` function to change the order of the factor levels. Use parameters .f and ... `fct_relevel(.f, ...)`, where .f is the factor variable whose levels you want to reorder and ... is the "levels" you want to move to the front of the factor order. Specify these in the order you want them to appear. </details>
+
+<details> <summary class="solution-button">💡 Click to see the Solution</summary>
+```{r, include = TRUE}
+# Reorder the size factor levels for a different perspective
+cat_breeds$size <- fct_relevel(cat_breeds$size, "Extra Large", "Large", "Medium", "Small")
+
+# Check the new order of the levels
+levels(cat_breeds$size)
+
+# Reverse the order to show small cat first
+cat_breeds$size <- fct_rev(cat_breeds$size)
+
+# Check the reversed order of the levels
+levels(cat_breeds$size)
+```
+</details>
+# Wrap-up and Additional Resources 🐾
+
+In this session, we've explored how to manipulate factors and labels in R using two powerful packages: `forcats` and `sjlabelled`. Factors allow us to organize categorical data more effectively, while labels provide clarity in data interpretation.
+
+For further reading, check out:
+
+[Forcats Package Documentation](https://forcats.tidyverse.org/)
+
+[Sjlabelled Package Documentation](https://strengejacke.github.io/sjlabelled/)
